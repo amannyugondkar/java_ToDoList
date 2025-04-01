@@ -31,9 +31,10 @@ Exception Handling (Custom & Built-in Exceptions)
 📌 How to Run
 
 1️⃣ Clone the repository:
+
 git clone https://github.com/your-username/todo-list-app.git
 cd todo-list-app
-2️⃣ Compile and run:
 
+2️⃣ Compile and run:
 javac ToDoListApplication.java  
 java ToDoListApplication  
