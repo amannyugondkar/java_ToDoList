@@ -3,6 +3,7 @@
 This Java-based To-Do List Application allows users to efficiently manage their tasks. It provides essential features like adding, editing, deleting, and viewing tasks based on priority. The application follows OOP principles, integrates exception handling, and interacts with a MySQL database via JDBC.
 
 🚀 Features
+
 ✅ User Authentication – Each task is linked to a user.
 ✅ Task Management – Add, edit, delete, and view tasks.
 ✅ Task Prioritization – Categorize tasks as LOW, MEDIUM, or HIGH priority.
@@ -26,10 +27,10 @@ Exception Handling (Custom & Built-in Exceptions)
  ┣ 📜 ReminderService.java       # Task reminder service  
  ┣ 📜 DatabaseOperations.java    # Handles database CRUD operations  
  ┗ 📜 CustomExceptions.java      # Defines custom exceptions  
+
 📌 How to Run
 
 1️⃣ Clone the repository:
-
 git clone https://github.com/your-username/todo-list-app.git
 cd todo-list-app
 2️⃣ Compile and run:
