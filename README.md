@@ -3,7 +3,6 @@
 This Java-based To-Do List Application allows users to efficiently manage their tasks. It provides essential features like adding, editing, deleting, and viewing tasks based on priority. The application follows OOP principles, integrates exception handling, and interacts with a MySQL database via JDBC.
 
 🚀 Features
-
 ✅ User Authentication – Each task is linked to a user.
 ✅ Task Management – Add, edit, delete, and view tasks.
 ✅ Task Prioritization – Categorize tasks as LOW, MEDIUM, or HIGH priority.
