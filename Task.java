@@ -81,5 +81,14 @@ public class Task {
     }
     
     @Override
-    public String toString() {}
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return "Task ID: " + id +
+                "\nTitle: " + title +
+                "\nDescription: " + description +
+                "\nDeadline: " + deadline.format(formatter) +
+                "\nPriority: " + priority +
+                "\nStatus: " + status +
+                "\nOwner: " + owner.getUsername();
+    }
 }
