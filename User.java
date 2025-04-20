@@ -59,7 +59,7 @@ abstract class Account extends SystemEntity {
         this.password = password;
     }
     
-    protected boolean containsSpecialChar(String password) {
+    protected static boolean containsSpecialChar(String password) {
         return password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
     }
     
