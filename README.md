@@ -69,6 +69,3 @@ The **To-Do List Application** is a Java-based task management system that allow
 - **Cloud Storage** to sync tasks across devices.
 - **AI-Based Task Recommendations** for smart planning.
 
----
-**Developed By:** _[Your Name]_  
-🚀 Happy Coding! 🚀
