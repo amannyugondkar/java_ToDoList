@@ -1,4 +1,6 @@
-// Notifiable.java
+//Notifiable.java
+package todo;
+
 public interface Notifiable {
     void notifyUser(User user, String message);
 }
