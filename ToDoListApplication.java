@@ -1,57 +1,55 @@
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
-import java.time.format.DateTimeFormatter;
 
-// Main class for the To-Do List Application
 public class ToDoListApplication {
-    private static TaskManager taskManager; // Manages tasks
-    private static User currentUser; // Stores currently logged-in user
-    private static Scanner scanner = new Scanner(System.in); // Scanner for user input
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Date format for input
+    private static TaskManager taskManager;
+    private static User currentUser;
+    private static Scanner scanner = new Scanner(System.in);
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public static void main(String[] args) {
-        // Initialize required services
+        // Initialize services
         ReminderService reminderService = new ReminderService();
         taskManager = new TaskManager(reminderService);
-        
-        // Creating a demo user
+
+        // For demo purposes, create a user
         currentUser = new User(1, "user1", "password");
-        
+
         boolean running = true;
         while (running) {
-            displayMenu(); // Show menu options
+            displayMenu();
             int choice = getIntInput("Enter your choice: ");
 
-            // Handle user choices
             switch (choice) {
                 case 1:
-                    addNewTask(); // Add new task
+                    addNewTask();
                     break;
                 case 2:
-                    viewAllTasks(); // View all tasks
+                    viewAllTasks();
                     break;
                 case 3:
-                    editTask(); // Edit an existing task
+                    editTask();
                     break;
                 case 4:
-                    deleteTask(); // Delete a task
+                    deleteTask();
                     break;
                 case 5:
-                    viewTasksByPriority(); // View tasks filtered by priority
+                    viewTasksByPriority();
                     break;
                 case 0:
-                    running = false; // Exit the application
+                    running = false;
                     System.out.println("Exiting application. Goodbye!");
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");
             }
         }
-        scanner.close(); // Close scanner when done
+
+        scanner.close();
     }
 
-    // Displays the menu options
     private static void displayMenu() {
         System.out.println("\n===== TO-DO LIST APPLICATION =====");
         System.out.println("1. Add New Task");
@@ -63,37 +61,43 @@ public class ToDoListApplication {
         System.out.println("==================================");
     }
 
-    // Adds a new task
     private static void addNewTask() {
         System.out.println("\n----- ADD NEW TASK -----");
         String title = getStringInput("Enter task title: ");
         String description = getStringInput("Enter task description: ");
+
         LocalDateTime deadline = getDateTimeInput("Enter deadline (yyyy-MM-dd HH:mm): ");
 
-        // Select task priority
         System.out.println("Select priority: ");
-        System.out.println("1. LOW\n2. MEDIUM\n3. HIGH");
+        System.out.println("1. LOW");
+        System.out.println("2. MEDIUM");
+        System.out.println("3. HIGH");
         int priorityChoice = getIntInput("Enter your choice: ");
-        
-        Task.Priority priority = switch (priorityChoice) {
-            case 1 -> Task.Priority.LOW;
-            case 2 -> Task.Priority.MEDIUM;
-            case 3 -> Task.Priority.HIGH;
-            default -> {
+
+        Task.Priority priority;
+        switch (priorityChoice) {
+            case 1:
+                priority = Task.Priority.LOW;
+                break;
+            case 2:
+                priority = Task.Priority.MEDIUM;
+                break;
+            case 3:
+                priority = Task.Priority.HIGH;
+                break;
+            default:
                 System.out.println("Invalid choice. Setting priority to MEDIUM by default.");
-                yield Task.Priority.MEDIUM;
-            }
-        };
+                priority = Task.Priority.MEDIUM;
+        }
 
         int taskId = taskManager.createTask(title, description, deadline, priority, currentUser);
         System.out.println("Task created successfully with ID: " + taskId);
     }
 
-    // Displays all tasks for the current user
     private static void viewAllTasks() {
         System.out.println("\n----- ALL TASKS -----");
         List<Task> tasks = taskManager.getAllTasks(currentUser);
-        
+
         if (tasks.isEmpty()) {
             System.out.println("No tasks found.");
             return;
@@ -105,12 +109,11 @@ public class ToDoListApplication {
         }
     }
 
-    // Edits an existing task
     private static void editTask() {
         System.out.println("\n----- EDIT TASK -----");
         int taskId = getIntInput("Enter task ID to edit: ");
-        Task task = taskManager.getTaskById(taskId);
 
+        Task task = taskManager.getTaskById(taskId);
         if (task == null || task.getOwner().getId() != currentUser.getId()) {
             System.out.println("Task not found or you don't have permission to edit it.");
             return;
@@ -118,33 +121,80 @@ public class ToDoListApplication {
 
         System.out.println("Current task details:");
         System.out.println(task);
-        
+
         System.out.println("\nWhat would you like to edit?");
-        System.out.println("1. Title\n2. Description\n3. Deadline\n4. Priority\n5. Status\n0. Cancel");
-        
+        System.out.println("1. Title");
+        System.out.println("2. Description");
+        System.out.println("3. Deadline");
+        System.out.println("4. Priority");
+        System.out.println("5. Status");
+        System.out.println("0. Cancel");
+
         int choice = getIntInput("Enter your choice: ");
-        
+
         switch (choice) {
-            case 1 -> task.setTitle(getStringInput("Enter new title: "));
-            case 2 -> task.setDescription(getStringInput("Enter new description: "));
-            case 3 -> task.setDeadline(getDateTimeInput("Enter new deadline (yyyy-MM-dd HH:mm): "));
-            case 4 -> {
-                System.out.println("Select new priority: \n1. LOW\n2. MEDIUM\n3. HIGH");
+            case 1:
+                String title = getStringInput("Enter new title: ");
+                task.setTitle(title);
+                break;
+            case 2:
+                String description = getStringInput("Enter new description: ");
+                task.setDescription(description);
+                break;
+            case 3:
+                LocalDateTime deadline = getDateTimeInput("Enter new deadline (yyyy-MM-dd HH:mm): ");
+                task.setDeadline(deadline);
+                break;
+            case 4:
+                System.out.println("Select new priority: ");
+                System.out.println("1. LOW");
+                System.out.println("2. MEDIUM");
+                System.out.println("3. HIGH");
                 int priorityChoice = getIntInput("Enter your choice: ");
-                task.setPriority(priorityChoice == 1 ? Task.Priority.LOW : (priorityChoice == 2 ? Task.Priority.MEDIUM : Task.Priority.HIGH));
-            }
-            case 5 -> {
-                System.out.println("Select new status: \n1. NOT_STARTED\n2. IN_PROGRESS\n3. COMPLETED");
+
+                switch (priorityChoice) {
+                    case 1:
+                        task.setPriority(Task.Priority.LOW);
+                        break;
+                    case 2:
+                        task.setPriority(Task.Priority.MEDIUM);
+                        break;
+                    case 3:
+                        task.setPriority(Task.Priority.HIGH);
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Priority not changed.");
+                }
+                break;
+            case 5:
+                System.out.println("Select new status: ");
+                System.out.println("1. NOT_STARTED");
+                System.out.println("2. IN_PROGRESS");
+                System.out.println("3. COMPLETED");
                 int statusChoice = getIntInput("Enter your choice: ");
-                task.setStatus(statusChoice == 1 ? Task.Status.NOT_STARTED : (statusChoice == 2 ? Task.Status.IN_PROGRESS : Task.Status.COMPLETED));
-            }
-            case 0 -> {
+
+                switch (statusChoice) {
+                    case 1:
+                        task.setStatus(Task.Status.NOT_STARTED);
+                        break;
+                    case 2:
+                        task.setStatus(Task.Status.IN_PROGRESS);
+                        break;
+                    case 3:
+                        task.setStatus(Task.Status.COMPLETED);
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Status not changed.");
+                }
+                break;
+            case 0:
                 System.out.println("Edit cancelled.");
                 return;
-            }
-            default -> System.out.println("Invalid choice. Task not modified.");
+            default:
+                System.out.println("Invalid choice. Task not modified.");
+                return;
         }
-        
+
         if (taskManager.editTask(task)) {
             System.out.println("Task updated successfully.");
         } else {
@@ -152,16 +202,75 @@ public class ToDoListApplication {
         }
     }
 
-    // Handles user input for string values
+    private static void deleteTask() {
+        System.out.println("\n----- DELETE TASK -----");
+        int taskId = getIntInput("Enter task ID to delete: ");
+
+        Task task = taskManager.getTaskById(taskId);
+        if (task == null || task.getOwner().getId() != currentUser.getId()) {
+            System.out.println("Task not found or you don't have permission to delete it.");
+            return;
+        }
+
+        String confirm = getStringInput("Are you sure you want to delete this task? (y/n): ");
+        if (confirm.equalsIgnoreCase("y")) {
+            if (taskManager.deleteTask(taskId)) {
+                System.out.println("Task deleted successfully.");
+            } else {
+                System.out.println("Failed to delete task.");
+            }
+        } else {
+            System.out.println("Delete cancelled.");
+        }
+    }
+
+    private static void viewTasksByPriority() {
+        System.out.println("\n----- VIEW TASKS BY PRIORITY -----");
+        System.out.println("Select priority: ");
+        System.out.println("1. LOW");
+        System.out.println("2. MEDIUM");
+        System.out.println("3. HIGH");
+        int priorityChoice = getIntInput("Enter your choice: ");
+
+        Task.Priority priority;
+        switch (priorityChoice) {
+            case 1:
+                priority = Task.Priority.LOW;
+                break;
+            case 2:
+                priority = Task.Priority.MEDIUM;
+                break;
+            case 3:
+                priority = Task.Priority.HIGH;
+                break;
+            default:
+                System.out.println("Invalid choice.");
+                return;
+        }
+
+        List<Task> tasks = taskManager.getTasksByPriority(currentUser, priority);
+
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks found with " + priority + " priority.");
+            return;
+        }
+
+        System.out.println("\nTasks with " + priority + " priority:");
+        for (Task task : tasks) {
+            System.out.println("\n" + task);
+            System.out.println("------------------");
+        }
+    }
+
     private static String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
 
-    // Handles user input for integer values with validation
     private static int getIntInput(String prompt) {
         int input = -1;
         boolean valid = false;
+
         while (!valid) {
             try {
                 System.out.print(prompt);
@@ -171,22 +280,25 @@ public class ToDoListApplication {
                 System.out.println("Invalid input. Please enter a number.");
             }
         }
+
         return input;
     }
 
-    // Handles user input for date-time values with validation
     private static LocalDateTime getDateTimeInput(String prompt) {
         LocalDateTime dateTime = null;
         boolean valid = false;
+
         while (!valid) {
             try {
                 System.out.print(prompt);
-                dateTime = LocalDateTime.parse(scanner.nextLine(), formatter);
+                String input = scanner.nextLine();
+                dateTime = LocalDateTime.parse(input, formatter);
                 valid = true;
             } catch (Exception e) {
                 System.out.println("Invalid format. Please use yyyy-MM-dd HH:mm");
             }
         }
+
         return dateTime;
     }
 }
