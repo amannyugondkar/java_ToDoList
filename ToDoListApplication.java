@@ -3,6 +3,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+// Custom Exceptions
+class TaskNotFoundException extends Exception {
+    public TaskNotFoundException(String message) {
+        super(message);
+    }
+}
+
+class InvalidDateFormatException extends Exception {
+    public InvalidDateFormatException(String message) {
+        super(message);
+    }
+}
+
 public class ToDoListApplication {
     private static TaskManager taskManager;
     private static User currentUser;
@@ -10,11 +23,9 @@ public class ToDoListApplication {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public static void main(String[] args) {
-        // Initialize services
         ReminderService reminderService = new ReminderService();
         taskManager = new TaskManager(reminderService);
 
-        // For demo purposes, create a user
         currentUser = new User(1, "user1", "password");
 
         boolean running = true;
@@ -65,7 +76,6 @@ public class ToDoListApplication {
         System.out.println("\n----- ADD NEW TASK -----");
         String title = getStringInput("Enter task title: ");
         String description = getStringInput("Enter task description: ");
-
         LocalDateTime deadline = getDateTimeInput("Enter deadline (yyyy-MM-dd HH:mm): ");
 
         System.out.println("Select priority: ");
@@ -110,117 +120,125 @@ public class ToDoListApplication {
     }
 
     private static void editTask() {
-        System.out.println("\n----- EDIT TASK -----");
-        int taskId = getIntInput("Enter task ID to edit: ");
+        try {
+            System.out.println("\n----- EDIT TASK -----");
+            int taskId = getIntInput("Enter task ID to edit: ");
 
-        Task task = taskManager.getTaskById(taskId);
-        if (task == null || task.getOwner().getId() != currentUser.getId()) {
-            System.out.println("Task not found or you don't have permission to edit it.");
-            return;
-        }
+            Task task = taskManager.getTaskById(taskId);
+            if (task == null || task.getOwner().getId() != currentUser.getId()) {
+                throw new TaskNotFoundException("Task not found or you don't have permission to edit it.");
+            }
 
-        System.out.println("Current task details:");
-        System.out.println(task);
+            System.out.println("Current task details:");
+            System.out.println(task);
 
-        System.out.println("\nWhat would you like to edit?");
-        System.out.println("1. Title");
-        System.out.println("2. Description");
-        System.out.println("3. Deadline");
-        System.out.println("4. Priority");
-        System.out.println("5. Status");
-        System.out.println("0. Cancel");
+            System.out.println("\nWhat would you like to edit?");
+            System.out.println("1. Title");
+            System.out.println("2. Description");
+            System.out.println("3. Deadline");
+            System.out.println("4. Priority");
+            System.out.println("5. Status");
+            System.out.println("0. Cancel");
 
-        int choice = getIntInput("Enter your choice: ");
+            int choice = getIntInput("Enter your choice: ");
 
-        switch (choice) {
-            case 1:
-                String title = getStringInput("Enter new title: ");
-                task.setTitle(title);
-                break;
-            case 2:
-                String description = getStringInput("Enter new description: ");
-                task.setDescription(description);
-                break;
-            case 3:
-                LocalDateTime deadline = getDateTimeInput("Enter new deadline (yyyy-MM-dd HH:mm): ");
-                task.setDeadline(deadline);
-                break;
-            case 4:
-                System.out.println("Select new priority: ");
-                System.out.println("1. LOW");
-                System.out.println("2. MEDIUM");
-                System.out.println("3. HIGH");
-                int priorityChoice = getIntInput("Enter your choice: ");
+            switch (choice) {
+                case 1:
+                    String title = getStringInput("Enter new title: ");
+                    task.setTitle(title);
+                    break;
+                case 2:
+                    String description = getStringInput("Enter new description: ");
+                    task.setDescription(description);
+                    break;
+                case 3:
+                    LocalDateTime deadline = getDateTimeInput("Enter new deadline (yyyy-MM-dd HH:mm): ");
+                    task.setDeadline(deadline);
+                    break;
+                case 4:
+                    System.out.println("Select new priority: ");
+                    System.out.println("1. LOW");
+                    System.out.println("2. MEDIUM");
+                    System.out.println("3. HIGH");
+                    int priorityChoice = getIntInput("Enter your choice: ");
 
-                switch (priorityChoice) {
-                    case 1:
-                        task.setPriority(Task.Priority.LOW);
-                        break;
-                    case 2:
-                        task.setPriority(Task.Priority.MEDIUM);
-                        break;
-                    case 3:
-                        task.setPriority(Task.Priority.HIGH);
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Priority not changed.");
-                }
-                break;
-            case 5:
-                System.out.println("Select new status: ");
-                System.out.println("1. NOT_STARTED");
-                System.out.println("2. IN_PROGRESS");
-                System.out.println("3. COMPLETED");
-                int statusChoice = getIntInput("Enter your choice: ");
+                    switch (priorityChoice) {
+                        case 1:
+                            task.setPriority(Task.Priority.LOW);
+                            break;
+                        case 2:
+                            task.setPriority(Task.Priority.MEDIUM);
+                            break;
+                        case 3:
+                            task.setPriority(Task.Priority.HIGH);
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Priority not changed.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Select new status: ");
+                    System.out.println("1. NOT_STARTED");
+                    System.out.println("2. IN_PROGRESS");
+                    System.out.println("3. COMPLETED");
+                    int statusChoice = getIntInput("Enter your choice: ");
 
-                switch (statusChoice) {
-                    case 1:
-                        task.setStatus(Task.Status.NOT_STARTED);
-                        break;
-                    case 2:
-                        task.setStatus(Task.Status.IN_PROGRESS);
-                        break;
-                    case 3:
-                        task.setStatus(Task.Status.COMPLETED);
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Status not changed.");
-                }
-                break;
-            case 0:
-                System.out.println("Edit cancelled.");
-                return;
-            default:
-                System.out.println("Invalid choice. Task not modified.");
-                return;
-        }
+                    switch (statusChoice) {
+                        case 1:
+                            task.setStatus(Task.Status.NOT_STARTED);
+                            break;
+                        case 2:
+                            task.setStatus(Task.Status.IN_PROGRESS);
+                            break;
+                        case 3:
+                            task.setStatus(Task.Status.COMPLETED);
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Status not changed.");
+                    }
+                    break;
+                case 0:
+                    System.out.println("Edit cancelled.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Task not modified.");
+                    return;
+            }
 
-        if (taskManager.editTask(task)) {
-            System.out.println("Task updated successfully.");
-        } else {
-            System.out.println("Failed to update task.");
+            if (taskManager.editTask(task)) {
+                System.out.println("Task updated successfully.");
+            } else {
+                System.out.println("Failed to update task.");
+            }
+
+        } catch (TaskNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     private static void deleteTask() {
-        System.out.println("\n----- DELETE TASK -----");
-        int taskId = getIntInput("Enter task ID to delete: ");
+        try {
+            System.out.println("\n----- DELETE TASK -----");
+            int taskId = getIntInput("Enter task ID to delete: ");
 
-        Task task = taskManager.getTaskById(taskId);
-        if (task == null || task.getOwner().getId() != currentUser.getId()) {
-            System.out.println("Task not found or you don't have permission to delete it.");
-            return;
-        }
-
-        String confirm = getStringInput("Are you sure you want to delete this task? (y/n): ");
-        if (confirm.equalsIgnoreCase("y")) {
-            if (taskManager.deleteTask(taskId)) {
-                System.out.println("Task deleted successfully.");
-            } else {
-                System.out.println("Failed to delete task.");
+            Task task = taskManager.getTaskById(taskId);
+            if (task == null || task.getOwner().getId() != currentUser.getId()) {
+                throw new TaskNotFoundException("Task not found or you don't have permission to delete it.");
             }
-        } else {
-            System.out.println("Delete cancelled.");
+
+            String confirm = getStringInput("Are you sure you want to delete this task? (y/n): ");
+            if (confirm.equalsIgnoreCase("y")) {
+                if (taskManager.deleteTask(taskId)) {
+                    System.out.println("Task deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete task.");
+                }
+            } else {
+                System.out.println("Delete cancelled.");
+            }
+
+        } catch (TaskNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -294,8 +312,12 @@ public class ToDoListApplication {
                 String input = scanner.nextLine();
                 dateTime = LocalDateTime.parse(input, formatter);
                 valid = true;
-            } catch (Exception e) {
-                System.out.println("Invalid format. Please use yyyy-MM-dd HH:mm");
+            } catch (DateTimeParseException e) {
+                try {
+                    throw new InvalidDateFormatException("Invalid format. Please use yyyy-MM-dd HH:mm");
+                } catch (InvalidDateFormatException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
         }
 
