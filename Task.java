@@ -19,9 +19,18 @@ public class Task {
     public enum Status {
         NOT_STARTED, IN_PROGRESS, COMPLETED
     }
+
+    public static class InvalidTaskTitleException extends Exception {
+        public InvalidTaskTitleException(String message) {
+            super(message);
+        }
+    }
+
+    
+
     
     // Constructor
-    public Task(int id, String title, String description, LocalDateTime deadline, Priority priority, User owner) {
+    public Task(int id, String title, String description, LocalDateTime deadline, Priority priority, User owner) throws InvalidTaskTitleException, {
         this.id = id;
         this.title = title;
         this.description = description;
