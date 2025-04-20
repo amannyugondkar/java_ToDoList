@@ -21,7 +21,7 @@ public class Task {
     }
     
     // Constructor
-    public Task(int id, String title, String description, LocalDateTime deadline, Priority priority, User owner) {}
+    public Task(int id, String title, String description, LocalDateTime deadline, Priority priority, User owner) {
         this.id = id;
         this.title = title;
         this.description = description;
